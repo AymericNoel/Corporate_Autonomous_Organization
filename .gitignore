@@ -5,7 +5,7 @@
 /.pnp
 .pnp.js
 
-/Cao1/node_modules
+/cao1TheGraph/node_modules
 
 # testing
 /coverage
