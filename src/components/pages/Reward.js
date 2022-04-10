@@ -3,9 +3,64 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
-import { CardHeader } from "@mui/material";
+import { CardHeader, ImageList,ImageListItem } from "@mui/material";
+import BlockchainContext from "../../context";
+import { useState, useEffect, useContext } from "react";
+import VisualizeNft from "../utils/ViewNftIPFS";
 
 function Reward() {
+  const { accounts, contracts, web3 } = useContext(BlockchainContext);
+  const [rewardsUri, setRewardsUri] = useState([]);
+
+  useEffect(async () => {
+    var nftsUri = [];
+    try {
+      var numberOfRewards = await contracts.RewardContract.methods
+        .currentNftByOwner(accounts[0])
+        .call();
+      for (let i = 0; i < Number(numberOfRewards); i++) {
+        var nftId = await contracts.RewardContract.methods
+          .tokenOfOwnerByIndex(accounts[0], i)
+          .call();
+        var nftUri = await contracts.RewardContract.methods
+          .tokenURI(nftId)
+          .call();
+
+        nftUri = await VisualizeNft(nftUri);
+        console.log(nftUri);
+        nftsUri.push(nftUri);
+      }
+      setRewardsUri(nftsUri);
+    } catch (error) {
+      setRewardsUri([]);
+      console.log(error);
+    }
+  }, [contracts]);
+
+  const toDisplay = () => {
+    if (rewardsUri.length > 0) {
+      return (
+        <div>
+          {
+            <ImageList sx={{ width: 800, height: 800 }} cols={3} rowHeight={164}>
+              {rewardsUri.map((uri, index) => (
+                <ImageListItem key={index}>
+                  <Typography textAlign={"center"} variant="subtitle1">Reward n°{index+1}</Typography>
+                  <img
+                    src={uri}
+                    loading="lazy"
+                  />
+                </ImageListItem>
+              ))}
+            </ImageList>
+          }
+        </div>
+      );
+    } else {
+      return <p>No rewards here yet ...!</p>;
+    }
+  };
+
   return (
     <div>
       <Typography
@@ -17,24 +72,7 @@ function Reward() {
         Rewards
       </Typography>
       <Box sx={{ mx: 3 }}>
-        <Grid container rowSpacing={5} columnSpacing={{ xs: 3, sm: 4, md: 5 }}>
-          {Array.from(Array(6)).map((_, index) => (
-            <Grid item xs={2} sm={4} md={4} key={index}>
-              <Card sx={{ boxShadow: 5 }}>
-                <CardHeader
-                  title={`Reward ${index}`}
-                  sx={{ textAlign: "center" }}
-                />
-                <CardMedia
-                  component="img"
-                  sx={{ width: "75%", mx: "auto", mb:2 }}
-                  image="https://s3.amazonaws.com/askbob/users/photos/2118/big/Photo_portrait_Aymeric_NOEL2.jpg?1624545267"
-                  alt="green iguana"
-                />
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+        {toDisplay()        }
       </Box>
     </div>
   );

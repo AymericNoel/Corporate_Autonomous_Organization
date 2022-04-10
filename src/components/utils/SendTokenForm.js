@@ -20,7 +20,7 @@ function SendTokenForm() {
     eth_addr: "",
     amount: 0,
     rate_month: "",
-    wrap:0,
+    wrap: 0,
   });
 
   const handleChangeForm = (name) => (event) => {
@@ -43,11 +43,9 @@ function SendTokenForm() {
   const onClickBtn = async () => {
     try {
       if (values.amount !== 0) {
-        await web3.eth.sendTransaction({
-          from: accounts[0],
-          to: values.eth_addr,
-          value: web3.utils.toWei(values.amount.toString()),
-        });
+        await contracts.CaoToken.methods
+        .mint(values.eth_addr, web3.utils.toWei(values.amount))
+        .send({ from: accounts[0] });
       } else {
         //begin flow rate
       }
@@ -114,10 +112,10 @@ function SendTokenForm() {
         <Button variant="contained" color="success" onClick={onClickBtn}>
           Validate
         </Button>
-        <Button variant="contained" color="success" >
+        <Button variant="contained" color="success">
           Approve tokens to be wrapped
         </Button>
-        <Button variant="contained" color="success" >
+        <Button variant="contained" color="success">
           wrap to fluid tokens
         </Button>
       </Box>

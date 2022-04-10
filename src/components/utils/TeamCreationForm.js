@@ -1,5 +1,5 @@
 import { TextField, Button, Box } from "@mui/material";
-import { NFTStorage, File } from "nft.storage";
+import { NFTStorage } from "nft.storage";
 import { useState, useContext } from "react";
 import BlockchainContext from "../../context";
 
@@ -20,7 +20,7 @@ function TeamCreationForm() {
     creation_date: "",
     eth_addr: "",
     inputFile: null,
-    nameFile: "Upload NFT Image Team Leader (jpg or png)",
+    nameFile: "Upload NFT Image Team Leader (png)",
     team_name: "",
   });
 
@@ -47,8 +47,6 @@ function TeamCreationForm() {
   };
 
   const storeNFT = async (fileContent, fileName) => {
-    const image = await fileFromPath(fileContent, fileName);
-
     const nftstorage = new NFTStorage({
       token: process.env.REACT_APP_NFT_STORAGE_TOKEN,
     });
@@ -56,33 +54,19 @@ function TeamCreationForm() {
     const description = "NFT for team member in CAO";
     const name = fileName;
     return nftstorage.store({
-      image,
+      image: fileContent,
       name,
       description,
     });
   };
 
-  const fileFromPath = async (fileContent, fileName) => {
-    const extension = fileName.substr(-3);
-    return new File([fileContent], fileName, { type: `image/${extension}` });
-  };
-
   const inputFileHandler = (event) => {
     try {
       const nameFile = event.target.files[0].name;
-      console.log(nameFile);
-      const fileReader = new FileReader();
-      fileReader.readAsText(event.target.files[0], "UTF-8");
-      fileReader.onload = (e) => {
-        try {
-          const nft = e.target.result;
-          setValues({ ...values, inputFile: nft, nameFile });
-        } catch (error) {
-          console.log(error);
-        }
-      };
+      const file = event.target.files[0];
+      setValues({ ...values, inputFile: file, nameFile });
     } catch (error) {
-      setValues({ ...values, nameFile: "Upload NFT Image Team Leader" });
+      setValues({ ...values, nameFile: "null" });
     }
   };
 

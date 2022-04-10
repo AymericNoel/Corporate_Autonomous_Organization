@@ -15,7 +15,7 @@ const style = {
 };
 
 function NewProposalForm() {
-  const { accounts, contracts } = useContext(BlockchainContext);
+  const { accounts, contracts, web3 } = useContext(BlockchainContext);
   const [values, setValues] = useState({
     description: "",
   });
@@ -26,8 +26,21 @@ function NewProposalForm() {
 
   const onClickBtn = async () => {
     try {
+      const tokenAddress = contracts.CaoToken._address;
+      const callData = web3.eth.abi.encodeFunctionSignature({
+        name: 'transfer',
+        type: 'function',
+        inputs: [{
+            type: 'address',
+            name: '0x3f0644F31A4C5359DA034954600d8a1dE4ad5df4'
+        },{
+            type: 'uint256',
+            name: '50'
+        }]
+    })
+
       await contracts.CaoContract.methods
-        .propose([], [0], [], values.description)
+        .propose([tokenAddress], [0], [callData], values.description)
         .send({ from: accounts[0] });
     } catch (error) {
       alert("Error from Tx");

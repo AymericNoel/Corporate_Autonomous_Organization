@@ -5,26 +5,74 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import { Button, CardHeader } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import BlockchainContext from "../../context";
+import VisualizeNft from "../utils/ViewNftIPFS";
 
 function Dashboard() {
+  const { accounts, contracts, web3 } = useContext(BlockchainContext);
   const [userData, setUserData] = useState({});
   const [connected, setConnected] = useState(false);
+  const [streamBalance, setStreamBalance] = useState(0);
+  const [fluxId, setFluxId]=useState(0)
 
-  useEffect(() => {
+
+  useEffect(async () => {
     var sw = JSON.parse(sessionStorage.getItem("skillWallet"));
+    var nftUri = "";
+    var teamInformations = {};
+    var nativeBalance=0;
     if (sw) {
+      const id = setInterval(() => setStreamBalance((oldCount) => oldCount + 0.003), 1500);
+      setFluxId(id)
+      try {
+        var nativeBalance = await contracts.CaoToken.methods
+          .balanceOf(accounts[0])
+          .call();
+
+        nativeBalance = web3.utils.fromWei(nativeBalance);
+        var teamNftId = await contracts.TeamContract.methods
+          .tokenOfOwnerByIndex(accounts[0], 0)
+          .call();
+        if (teamNftId != "") {
+          nftUri = await contracts.TeamContract.methods
+            .tokenURI(teamNftId)
+            .call();            
+          nftUri = await VisualizeNft(nftUri);
+          console.log(nftUri)
+          var teamId = await contracts.TeamContract.methods
+            .teamByTokenId(teamNftId)
+            .call();
+          teamId += 1;
+          teamInformations = await contracts.TeamContract.methods
+            .teamById(teamId)
+            .call();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+
       setUserData({
         username: sw.nickname,
         profileImageUrl: sw.imageUrl,
         isLoggedIn: true,
-        coreTeam: sw.isCoreTeamMember
+        coreTeam: sw.isCoreTeamMember,
+        nativeBalance: nativeBalance,
+        nftUri,
+        teamInformations,
       });
-      setConnected(true)
-    }else{
-      setConnected(false)
+      setConnected(true);
+      return () => {
+        clearInterval(id);
+      };
+    } else {
+      setConnected(false);
     }
-  }, [connected]);
+  }, [contracts]);
+
+  const stopTimer=()=>{
+    clearInterval(fluxId);    
+  }
 
   const toDisplay = () => {
     if (connected) {
@@ -42,10 +90,18 @@ function Dashboard() {
                     alt="avatar"
                   />
                   <CardContent>
-                    <Typography variant="body2" color="text.secondary" textAlign="center">
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      textAlign="center"
+                    >
                       My rank : {userData.username}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" textAlign="center">
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      textAlign="center"
+                    >
                       Core team member : {userData.coreTeam.toString()}
                     </Typography>
                   </CardContent>
@@ -54,14 +110,24 @@ function Dashboard() {
               <Grid item xs>
                 <Card sx={{ boxShadow: 5 }}>
                   <CardHeader title="TEAM" sx={{ textAlign: "center" }} />
-                  <CardContent>
-                    <Typography gutterBottom variant="h6" component="div">
-                      NFT team :
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      My team is
-                    </Typography>
-                  </CardContent>
+                  {userData.nftUri != "" && (
+                    <div>
+                      <CardMedia
+                        component="img"
+                        sx={{ width: "50%", mx: "auto" }}
+                        image={"https://nftstorage.link/ipfs/bafybeia5s7c3btftjvu7t35l73nithmnedukvtchpnkeupa2v2v6ckwbfi/trophy.png"}
+                        alt="team nft"
+                      />
+                      <CardContent>
+                        <Typography gutterBottom variant="h6" component="div">
+                          My team is : {userData.teamInformations[1]}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          We are : {Number(userData.teamInformations[3]) + 1}
+                        </Typography>
+                      </CardContent>
+                    </div>
+                  )}
                 </Card>
               </Grid>
               <Grid item xs>
@@ -72,23 +138,27 @@ function Dashboard() {
                       Cao governance balance
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      0.005 CAO
+                      {userData.nativeBalance} CAO
                     </Typography>
-                    <Typography gutterBottom variant="h6" component="div" marginTop={2}>
+                    <Typography
+                      gutterBottom
+                      variant="h6"
+                      component="div"
+                      marginTop={2}
+                    >
                       Cao flux balance
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      5 CAO
+                      {streamBalance} CAO
                     </Typography>
-                    <Box sx={{my: 5, textAlign:"center"}}>
-                      <Button variant="contained" color="info" sx={{m: 2}}>
-                      Stop flux
-                    </Button>
-                    <Button variant="contained" color="info">
-                      Convert flux tokens to Cao for governance
-                    </Button>
+                    <Box sx={{ my: 5, textAlign: "center" }}>
+                      <Button variant="contained" color="info" sx={{ m: 2 }} onClick={stopTimer}>
+                        Stop flux
+                      </Button>
+                      <Button variant="contained" color="info">
+                        Convert flux tokens to Cao for governance
+                      </Button>
                     </Box>
-                    
                   </CardContent>
                 </Card>
               </Grid>

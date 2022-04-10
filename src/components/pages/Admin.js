@@ -5,6 +5,7 @@ import {
   CardHeader,
   Typography,
   Modal,
+  Grid,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useState, useEffect, useContext } from "react";
@@ -33,12 +34,27 @@ function Admin() {
   const SendTokenModalOpen = () => setSendTokenOpen(true);
   const SendTokenModalClose = () => setSendTokenOpen(false);
 
-  useEffect(() => {
+  const [nativeBalance, setNativeBalance] = useState(0);
+  const [requiredBalance, setRequiredBalance] = useState(0);
+
+  useEffect(async () => {
     var sw = JSON.parse(sessionStorage.getItem("skillWallet"));
     if (sw && sw.isCoreTeamMember) {
+      try {
+        var balance = await contracts.RewardContract.methods
+          .getEtherBalance()
+          .call();
+        var requiredBalance = await contracts.RewardContract.methods
+          .requiredEthers()
+          .call();
+        setNativeBalance(web3.utils.fromWei(balance));
+        setRequiredBalance(web3.utils.fromWei(requiredBalance));
+      } catch (error) {
+        console.log(error);
+      }
       setIsAdmin(true);
     }
-  }, [isAdmin]);
+  }, [contracts]);
 
   const giveEtherAway = async () => {
     try {
@@ -55,8 +71,8 @@ function Admin() {
     try {
       await web3.eth.sendTransaction({
         from: accounts[0],
-        to: contracts.RewardContract.option.address,
-        value: web3.utils.toWei('1'),
+        to: contracts.RewardContract._address,
+        value: web3.utils.toWei("0.5"),
       });
     } catch (error) {
       alert("Transaction failed");
@@ -98,7 +114,12 @@ function Admin() {
               </Modal>
             </Box>
             <Box>
-              <Button variant="contained" size="medium" sx={{ m: 1 }} onClick={SendTokenModalOpen}>
+              <Button
+                variant="contained"
+                size="medium"
+                sx={{ m: 1 }}
+                onClick={SendTokenModalOpen}
+              >
                 Start tokens flow / Send Tokens
               </Button>
               <Modal open={sendTokenOpen} onClose={SendTokenModalClose}>
@@ -141,9 +162,15 @@ function Admin() {
           </Box>
           <Box sx={{ width: "20%", ml: 3, mt: 8 }}>
             <Card sx={{ boxShadow: 6, textAlign: "center" }}>
-              <CardHeader title="Current Ether balance:" />
+              <CardHeader title="Current Contract Ether balance:" />
               <CardContent>
-                <Typography variant="h6">5 ethers</Typography>
+                <Typography variant="h6">{nativeBalance} ethers</Typography>
+              </CardContent>
+            </Card>
+            <Card sx={{ boxShadow: 6, textAlign: "center" , mt:4}}>
+              <CardHeader title="Required Contract Ether balance:" />
+              <CardContent>
+                <Typography variant="h6">{requiredBalance} ethers</Typography>
               </CardContent>
             </Card>
           </Box>

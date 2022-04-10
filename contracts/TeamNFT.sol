@@ -107,7 +107,7 @@ contract TeamNFT is ERC721Enumerable, Ownable, ERC721URIStorage {
         newTeam.teamId = teamId;
         newTeam.teamLeader = _teamLeader;
         newTeam.teamName = _teamName;
-        newTeam.totalMembers = 0;
+        newTeam.totalMembers = 1;
         addressInATeam[_teamLeader];
         _mintNft(_teamLeader, _tokenURILeader, teamId);
         emit TeamCreated(teamId);

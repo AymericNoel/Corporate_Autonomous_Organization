@@ -54,7 +54,7 @@ function ResponseProposalForm(props) {
         autoComplete="off"
         handleChangeForm={handleChangeForm}
       >
-        <FormLabel id="demo-radio-buttons-group-label">Choice</FormLabel>
+        <FormLabel id="demo-radio-buttons-group-label">Choice for proposal n°{props.params.id}</FormLabel>
         <RadioGroup
           aria-labelledby="demo-radio-buttons-group-label"
           defaultValue="Abstain"

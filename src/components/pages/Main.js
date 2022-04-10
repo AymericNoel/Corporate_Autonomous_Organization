@@ -1,29 +1,42 @@
-import { Typography } from "@mui/material";
+import { ListItemText, Typography, List } from "@mui/material";
 import { Box } from "@mui/system";
-import { useContext, useEffect, useState } from "react";
-import BlockchainContext from "../../context";
 
 function Main() {
-  const { accounts } = useContext(BlockchainContext);
-  const [address, setAddress]= useState("undefined address");
+  // const { accounts } = useContext(BlockchainContext);
+  // const [address, setAddress]= useState("undefined address");
 
-  useEffect(() => {
-    const load = async () => {
-      const address = accounts[0];
-      setAddress(address)
-    };
+  // useEffect(() => {
+  //   const load = async () => {
+  //     const address = accounts[0];
+  //     setAddress(address)
+  //   };
 
-    if (typeof accounts !== "undefined") {
-      load();
-    }
-  }, [accounts]);
+  //   if (typeof accounts !== "undefined") {
+  //     load();
+  //   }
+  // }, [accounts]);
+
   return (
     <div>
-      <Typography align="center" variant="h3">
-        Corporate Autonomous Organization
+      <Typography align="center" variant="h3" marginTop={4}>
+        Corporate Autonomous Organization (CAO)
       </Typography>
-      <Box sx={{ m: 5 }}>description de l'appli ici</Box>
-      <p>{address}</p>
+      <Box sx={{  m: 10 }}>
+        <Typography variant="subtitle1">
+          If you want to take part in the life of your company, if you want to
+          gamify your career and those of your colleagues, this site is for you.
+          Indeed, you can :
+          <ul>
+            <li>Earn rewards</li>
+            <li>Have a continuous stream of cryptocurrencies</li>
+            <li>Earn ethers at the end of each month</li>
+            <li>
+              Vote and propose improvements or requests to make your company
+              grow together
+            </li>
+          </ul>
+        </Typography>
+      </Box>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { TextField, Button, Box } from "@mui/material";
 import { useState, useContext } from "react";
-import { NFTStorage, File } from "nft.storage";
+import { NFTStorage } from "nft.storage";
 import BlockchainContext from "../../context";
 
 const style = {
@@ -15,13 +15,13 @@ const style = {
 };
 
 function MintForm(props) {
-  const { accounts, contracts,web3 } = useContext(BlockchainContext);
+  const { accounts, contracts, web3 } = useContext(BlockchainContext);
   const [values, setValues] = useState({
     eth_addr: "",
     team_id: "",
     token_amount: "",
     inputFile: null,
-    nameFile: "Upload NFT Image",
+    nameFile: "Upload NFT Image png only",
   });
 
   const handleChangeForm = (name) => (event) => {
@@ -36,8 +36,12 @@ function MintForm(props) {
           .mint(values.eth_addr, values.team_id, metadata.url)
           .send({ from: accounts[0] });
       } else {
-        await contracts.TeamContract.methods
-          .RewardContract(values.eth_addr, web3.utils.toWei(values.token_amount.toString()), metadata.url)
+        await contracts.RewardContract.methods
+          .mint(
+            values.eth_addr,
+            web3.utils.toWei(values.token_amount),
+            metadata.url
+          )
           .send({ from: accounts[0] });
       }
       console.log(metadata);
@@ -48,8 +52,6 @@ function MintForm(props) {
   };
 
   const storeNFT = async (fileContent, fileName) => {
-    const image = await fileFromPath(fileContent, fileName);
-
     const nftstorage = new NFTStorage({
       token: process.env.REACT_APP_NFT_STORAGE_TOKEN,
     });
@@ -57,31 +59,17 @@ function MintForm(props) {
     const description = "NFT for team member in CAO";
     const name = fileName;
     return nftstorage.store({
-      image,
+      image:fileContent,
       name,
       description,
     });
   };
 
-  const fileFromPath = async (fileContent, fileName) => {
-    const extension = fileName.substr(-3);
-    return new File([fileContent], fileName, { type: `image/${extension}` });
-  };
-
   const inputFileHandler = (event) => {
     try {
       const nameFile = event.target.files[0].name;
-      console.log(nameFile);
-      const fileReader = new FileReader();
-      fileReader.readAsText(event.target.files[0], "UTF-8");
-      fileReader.onload = (e) => {
-        try {
-          const nft = e.target.result;
-          setValues({ ...values, inputFile: nft, nameFile });
-        } catch (error) {
-          console.log(error);
-        }
-      };
+      const file = event.target.files[0];
+      setValues({ ...values, inputFile: file, nameFile });
     } catch (error) {
       setValues({ ...values, nameFile: "null" });
     }

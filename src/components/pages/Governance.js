@@ -41,13 +41,15 @@ function Governance() {
             }
           }}
           columns={[
-            { field: "col1", headerName: "Column 1", width: 600 },
-            { field: "col2", headerName: "Column 2", minWidth: 150, flex: 0.2 },
+            { field: "id", headerName: "Id", width: 50 },
+            { field: "proposalContent", headerName: "Proposal content", minWidth: 150, flex: 0.2 },
+            { field: "status", headerName: "Status", minWidth: 100 },
           ]}
           rows={[
-            { id: 1, col1: "Hello", col2: "World" },
-            { id: 2, col1: "DataGridPro", col2: "is Awesome" },
-            { id: 3, col1: "MUI", col2: "is Amazing" },
+            { id: 1, proposalContent: "This is the first proposal !", status: "Open" },
+            { id: 2, proposalContent: "Getting all banks to adopt bitcoin", status: "Close" },
+            { id: 3, proposalContent: "Get sunshine every day ", status: "Close" },
+            { id: 4, proposalContent: "Make me win", status: "Open" },
           ]}
         />{" "}
       </Box>
