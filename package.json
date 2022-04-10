@@ -32,6 +32,7 @@
     "@openzeppelin/contracts": "^4.5.0",
     "@skill-wallet/auth": "^1.0.50",
     "@superfluid-finance/ethereum-contracts": "^1.1.1",
+    "@superfluid-finance/sdk-core": "^0.3.2",
     "@testing-library/jest-dom": "^5.16.3",
     "@testing-library/react": "^12.1.4",
     "@testing-library/user-event": "^13.5.0",

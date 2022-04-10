@@ -1,6 +1,7 @@
 import { TextField, Button, Box } from "@mui/material";
 import { useState, useContext } from "react";
 import BlockchainContext from "../../context";
+import { Framework } from "@superfluid-finance/sdk-core";
 
 const style = {
   position: "absolute",
@@ -44,15 +45,31 @@ function SendTokenForm() {
     try {
       if (values.amount !== 0) {
         await contracts.CaoToken.methods
-        .mint(values.eth_addr, web3.utils.toWei(values.amount))
-        .send({ from: accounts[0] });
+          .mint(values.eth_addr, web3.utils.toWei(values.amount))
+          .send({ from: accounts[0] });
       } else {
-        //begin flow rate
       }
     } catch (error) {
       alert("error during Tx");
       console.log(error);
     }
+  };
+
+  const beginFlow = async (receiver) => {
+    const provider = web3.givenProvider()
+    const sf = await Framework.create({
+      networkName: "Mumbai",
+      provider: provider,
+    });
+    const signer = provider.getSigner();
+
+    const createFlowOperation = sf.cfaV1.createFlow({
+      flowRate: flow_rate,
+      receiver: receiver,
+      superToken: REACT_APP_SUPER_TOKEN_ADDRESS,
+    });
+    const result = await createFlowOperation.exec(signer);
+    console.log(result);
   };
 
   return (
