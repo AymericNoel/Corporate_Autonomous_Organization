@@ -8,6 +8,7 @@
     "compile": "npx truffle compile",
     "ganache": "npx ganache-cli",
     "migrate:ganache": "npx truffle migrate --network ganache --reset --compile-all",
+    "migrate:mumbai": "npx truffle migrate --network mumbai --reset --compile-all",
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "eject": "react-scripts eject"
@@ -24,6 +25,7 @@
   "dependencies": {
     "@emotion/react": "^11.8.2",
     "@emotion/styled": "^11.8.1",
+    "@graphprotocol/graph-cli": "^0.29.0",
     "@mui/icons-material": "^5.5.1",
     "@mui/material": "^5.5.3",
     "@mui/x-data-grid": "^5.8.0",
@@ -33,6 +35,8 @@
     "@testing-library/jest-dom": "^5.16.3",
     "@testing-library/react": "^12.1.4",
     "@testing-library/user-event": "^13.5.0",
+    "@truffle/hdwallet-provider": "^2.0.5",
+    "dotenv": "^16.0.0",
     "ganache-cli": "^6.12.2",
     "nft.storage": "^6.2.0",
     "react": "^17.0.2",
