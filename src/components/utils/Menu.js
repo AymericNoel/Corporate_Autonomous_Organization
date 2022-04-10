@@ -12,11 +12,6 @@ import MenuItem from "@mui/material/MenuItem";
 import { Link } from "@mui/material";
 
 const pages = ["Dashboard", "Reward", "Governance", "Admin"];
-const settings = [
-  "Connect wallet",
-  "View wallet in etherscan",
-  "View wallet stats",
-];
 
 const AppBarComponent = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -99,7 +94,7 @@ const AppBarComponent = () => {
 
           <Box sx={{ flexGrow: 0 }}>
             <sw-auth
-              partner-key="0d3fe09d8094a5281b6894e8182a27429278e59f"
+              partner-key={process.env.REACT_APP_PARTNER_WALLET}
               use-dev
             ></sw-auth>
           </Box>
